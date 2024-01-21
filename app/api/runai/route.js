@@ -124,7 +124,14 @@ export async function POST(req,res) {
     try{
       var generation = await run(data.author,data.prompturl,data.promptheading,data.promptpob,data.prompt)
      let sentt= await generation.text() 
-      return new Response(JSON.stringify({"gen":sentt}))
+      return new Response(JSON.stringify({"gen":sentt}),{
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  })
         } catch (error) {
             console.error(error);
             return NextResponse.json({ error: 'Internal server error' });
