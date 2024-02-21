@@ -124,9 +124,9 @@ export async function POST(req,res) {
     try{
       var generation = await run(data.author,data.prompturl,data.promptheading,data.promptpob,data.prompt)
      let sentt= await generation.text() 
-      return new Response(JSON.stringify({"gen":sentt})
-  })
-        } catch (error) {
+      return new Response(JSON.stringify({"gen":sentt}))
+  }
+         catch (error) {
             console.error(error);
             return NextResponse.json({ error: 'Internal server error' });
         }
