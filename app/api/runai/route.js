@@ -118,38 +118,30 @@ const genAI = new GoogleGenerativeAI(getapi());
 
 
 
-export async function POST(req, res) {
+export async function POST(req,res) {
+  const data  = await req.json()
   try {
-    const data = await req.json();
-    const generation = await run(
-      data.author,
-      data.prompturl,
-      data.promptheading,
-      data.promptpob,
-      data.prompt
-    );
-    const sentt = await generation.text();
+    var generation = await run(data.author, data.prompturl, data.promptheading, data.promptpob, data.prompt)
+    let sentt = await generation.text() 
 
-    let responseData;
-
-    try {
-      const jsonSentt = JSON.parse(sentt);
-      responseData = { gen: jsonSentt };
-    } catch (jsonError) {
-      // If parsing fails, treat the response as a plain string
-      responseData = { gen: sentt };
+    // Check if the response is a string that looks like JSON
+    if (typeof sentt === 'string' && sentt.trim().startsWith('{')) {
+      try {
+        // Try parsing it as JSON
+        sentt = JSON.parse(sentt);
+      } catch (error) {
+        console.error('Error parsing AI response:', error);
+      }
     }
 
-    return new Response(JSON.stringify(responseData), {
-      headers: { 'Content-Type': 'application/json' },
-    });
+    // Always return a JSON response
+    return new Response(JSON.stringify({"gen": sentt}))
   } catch (error) {
     console.error(error);
-    return new Response(JSON.stringify({ error: 'Internal server error' }), {
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return NextResponse.json({ error: 'Internal server error' });
   }
 }
+
 
 
 
