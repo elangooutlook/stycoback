@@ -118,21 +118,39 @@ const genAI = new GoogleGenerativeAI(getapi());
 
 
 
-export async function POST(req,res) {
-  const data  =await req.json()
-  // console.log("data",data)
-    try{
-      var generation = await run(data.author,data.prompturl,data.promptheading,data.promptpob,data.prompt)
-     let sentt= await generation.text() 
-      return new Response(JSON.stringify({"gen":sentt}))
-  }
-         catch (error) {
-            console.error(error);
-            return NextResponse.json({ error: 'Internal server error' });
-        }
-        
+export async function POST(req, res) {
+  try {
+    const data = await req.json();
+    const generation = await run(
+      data.author,
+      data.prompturl,
+      data.promptheading,
+      data.promptpob,
+      data.prompt
+    );
+    const sentt = await generation.text();
 
+    let responseData;
+
+    try {
+      const jsonSentt = JSON.parse(sentt);
+      responseData = { gen: jsonSentt };
+    } catch (jsonError) {
+      // If parsing fails, treat the response as a plain string
+      responseData = { gen: sentt };
     }
+
+    return new Response(JSON.stringify(responseData), {
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (error) {
+    console.error(error);
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+}
+
 
 
 
