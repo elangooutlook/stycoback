@@ -123,18 +123,6 @@ export async function POST(req,res) {
   try {
     var generation = await run(data.author, data.prompturl, data.promptheading, data.promptpob, data.prompt)
     let sentt = await generation.text() 
-
-    // Check if the response is a string that looks like JSON
-    if (typeof sentt === 'string' && sentt.trim().startsWith('{')) {
-      try {
-        // Try parsing it as JSON
-        sentt = JSON.parse(sentt);
-      } catch (error) {
-        console.error('Error parsing AI response:', error);
-      }
-    }
-
-    // Always return a JSON response
     return new Response(JSON.stringify({"gen": sentt}))
   } catch (error) {
     console.error(error);
